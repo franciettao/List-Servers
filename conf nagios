@@ -1,0 +1,161 @@
+# Emplacements de fichiers
+cfg_file=/usr/local/nagios/etc/objects/commands.cfg
+cfg_file=/usr/local/nagios/etc/objects/contacts.cfg
+cfg_file=/usr/local/nagios/etc/objects/timeperiods.cfg
+cfg_file=/usr/local/nagios/etc/objects/templates.cfg
+cfg_file=/usr/local/nagios/etc/objects/hosts.cfg
+cfg_file=/usr/local/nagios/etc/objects/services.cfg
+
+# Définir la configuration des hôtes
+define host {
+    use                     generic-host
+    host_name               server1
+    alias                   Server 1
+    address                 10.8.2.123
+}
+
+define host {
+    use                     generic-host
+    host_name               server2
+    alias                   Server 2
+    address                 10.8.2.220
+}
+
+define host {
+    use                     generic-host
+    host_name               server3
+    alias                   Server 3
+    address                 10.8.2.221
+}
+
+# Surveillance de la connexion par ping
+define service {
+    use                     generic-service
+    host_name               server1
+    service_description     Ping
+    check_command           check_ping!100.0,20%!500.0,60%
+}
+
+define service {
+    use                     generic-service
+    host_name               server2
+    service_description     Ping
+    check_command           check_ping!100.0,20%!500.0,60%
+}
+
+define service {
+    use                     generic-service
+    host_name               server3
+    service_description     Ping
+    check_command           check_ping!100.0,20%!500.0,60%
+}
+
+# Surveillance de la disponibilité HTTP
+define service {
+    use                     generic-service
+    host_name               server1
+    service_description     HTTP
+    check_command           check_http
+}
+
+define service {
+    use                     generic-service
+    host_name               server2
+    service_description     HTTP
+    check_command           check_http
+}
+
+define service {
+    use                     generic-service
+    host_name               server3
+    service_description     HTTP
+    check_command           check_http
+}
+
+# Surveillance de la disponibilité SSH
+define service {
+    use                     generic-service
+    host_name               server1
+    service_description     SSH
+    check_command           check_ssh
+}
+
+define service {
+    use                     generic-service
+    host_name               server2
+    service_description     SSH
+    check_command           check_ssh
+}
+
+define service {
+    use                     generic-service
+    host_name               server3
+    service_description     SSH
+    check_command           check_ssh
+}
+
+# Surveillance de l'utilisation du disque
+define service {
+    use                     generic-service
+    host_name               server1
+    service_description     Disk Space
+    check_command           check_disk!20%!10%!/
+}
+
+define service {
+    use                     generic-service
+    host_name               server2
+    service_description     Disk Space
+    check_command           check_disk!20%!10%!/
+}
+
+define service {
+    use                     generic-service
+    host_name               server3
+    service_description     Disk Space
+    check_command           check_disk!20%!10%!/
+}
+
+# Surveillance de la charge du CPU
+define service {
+    use                     generic-service
+    host_name               server1
+    service_description     CPU Load
+    check_command           check_nrpe!check_cpu
+}
+
+define service {
+    use                     generic-service
+    host_name               server2
+    service_description     CPU Load
+    check_command           check_nrpe!check_cpu
+}
+
+define service {
+    use                     generic-service
+    host_name               server3
+    service_description     CPU Load
+    check_command           check_nrpe!check_cpu
+}
+
+# Surveillance de la mémoire
+define service {
+    use                     generic-service
+    host_name               server1
+    service_description     Memory Usage
+    check_command           check_nrpe!check_mem
+}
+
+define service {
+    use                     generic-service
+    host_name               server2
+    service_description     Memory Usage
+    check_command           check_nrpe!check_mem
+}
+
+define service {
+    use                     generic-service
+    host_name               server3
+    service_description     Memory Usage
+    check_command           check_nrpe!check_mem
+}

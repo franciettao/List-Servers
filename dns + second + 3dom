@@ -1,0 +1,73 @@
+#!/bin/bash
+
+# Demander à l'utilisateur de saisir les adresses IP et les noms de domaine pour chaque zone
+read -p "Veuillez saisir l'adresse IP de la zone 1 (par exemple, 192.168.1.100): " ip_zone1
+read -p "Veuillez saisir le nom de domaine de la zone 1 (par exemple, zone1.example.com): " domain_zone1
+
+read -p "Veuillez saisir l'adresse IP de la zone 2 (par exemple, 192.168.1.101): " ip_zone2
+read -p "Veuillez saisir le nom de domaine de la zone 2 (par exemple, zone2.example.com): " domain_zone2
+
+read -p "Veuillez saisir l'adresse IP de la zone 3 (par exemple, 192.168.1.102): " ip_zone3
+read -p "Veuillez saisir le nom de domaine de la zone 3 (par exemple, zone3.example.com): " domain_zone3
+
+# Installation de Git
+echo "Installation de Git..."
+sudo apt update
+sudo apt install git -y
+echo "Git installé."
+
+# Installation de BIND9 (serveur DNS)
+echo "Installation de BIND9..."
+sudo apt install bind9 -y
+echo "BIND9 installé."
+
+# Configuration des zones DNS
+echo "Configuration des zones DNS..."
+
+# Fonction pour configurer une zone directe et inversée
+configure_zones() {
+    zone_name=$1
+    zone_ip_var="ip_$zone_name"
+    domain_name_var="domain_$zone_name"
+
+    echo "Configuration de la zone pour $zone_name."
+
+    # Configuration de la zone directe
+    cat <<EOL | sudo tee "/etc/bind/db.$zone_name"
+\$TTL    604800
+@       IN      SOA     ns1.$zone_name. admin.$zone_name. (
+                             2011112904 ; Serial
+                             604800     ; Refresh
+                             86400      ; Retry
+                             2419200    ; Expire
+                             604800 )   ; Negative Cache TTL
+;
+@       IN      NS      ns1.$zone_name.
+ns1     IN      A       ${!zone_ip_var}
+EOL
+
+    echo "Zone pour $zone_name configurée."
+
+    # Configuration de la zone inversée
+    reverse_ip=$(echo ${!zone_ip_var} | awk -F'.' '{print $3"."$2"."$1}')
+
+    cat <<EOL | sudo tee "/etc/bind/db.$reverse_ip"
+\$TTL    604800
+@       IN      SOA     ns1.$zone_name. admin.$zone_name. (
+                             2011112904 ; Serial
+                             604800     ; Refresh
+                             86400      ; Retry
+                             2419200    ; Expire
+                             604800 )   ; Negative Cache TTL
+;
+@       IN      NS      ns1.$zone_name.
+10      IN      PTR     ns1.$zone_name. ; 10 est le dernier octet de l'adresse IP (par exemple, 192.168.1.10)
+EOL
+
+    echo "Zone inversée pour $zone_name configurée."
+}
+
+# Configurer trois zones
+configure_zones "$domain_zone1"
+configure_zones "$domain_zone2"
+configure_zones "$domain_zone3"
